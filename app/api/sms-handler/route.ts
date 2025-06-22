@@ -1,3 +1,4 @@
+// app/api/trigger-emergency/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 
@@ -6,89 +7,85 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.formData();
-    const fromNumber = body.get("From") as string;
-    const incomingMessage = body.get("Body") as string;
-    const toNumber = body.get("To") as string;
-
-    console.log(`Received SMS from ${fromNumber}: ${incomingMessage}`);
-
-    const emergencyKeywords = ["emergency", "help", "sos", "urgent", "panic"];
-    const isEmergency = emergencyKeywords.some((keyword) =>
-      incomingMessage.toLowerCase().includes(keyword)
-    );
-
-    let responseMessage: string;
-
-    if (isEmergency) {
-      responseMessage = `🚨 EMERGENCY RECEIVED 🚨
-Alert activated!
-Time: ${new Date().toLocaleTimeString("en-IN")}
-Help is coming. Stay calm.
-Reply CANCEL to stop.`;
-
-      await triggerEmergencyProtocol(fromNumber, incomingMessage);
-    } else {
-      responseMessage = `Thanks for your message: "${incomingMessage}"
-For emergencies, text: EMERGENCY, HELP, SOS, URGENT
-System active 24/7.`;
-    }
-
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Message>${responseMessage}</Message>
-</Response>`;
-
-    return new NextResponse(twiml, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/xml",
-      },
-    });
-  } catch (error) {
-    console.error("SMS handler error:", error);
-
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Message>System temporarily unavailable. For emergencies, call emergency services directly.</Message>
-</Response>`;
-
-    return new NextResponse(errorTwiml, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/xml",
-      },
-    });
-  }
+interface RequestBody {
+  emergencyContact?: string;
+  userLocation?: string;
 }
 
-async function triggerEmergencyProtocol(
-  fromNumber: string,
-  message: string
-): Promise<void> {
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  callSid?: string;
+  smsSid?: string;
+  error?: string;
+}
+
+export async function POST(
+  req: NextRequest
+): Promise<NextResponse<ApiResponse>> {
   try {
-    const emergencyContacts = ["+917684844015"];
+    const body: RequestBody = await req.json();
+    const { emergencyContact, userLocation } = body;
 
-    const emergencyAlert = `🚨 EMERGENCY SMS 🚨
-From: ${fromNumber}
-Msg: "${message}"
-Time: ${new Date().toLocaleTimeString("en-IN")}
-Respond now!`;
+    console.log("Emergency trigger request:", body);
+    console.log("Environment check:", {
+      hasSid: !!process.env.TWILIO_ACCOUNT_SID,
+      hasToken: !!process.env.TWILIO_AUTH_TOKEN,
+      hasPhone: !!process.env.TWILIO_PHONE_NUMBER,
+      phoneNumber: process.env.TWILIO_PHONE_NUMBER,
+    });
 
-    for (const contact of emergencyContacts) {
-      try {
-        await client.messages.create({
-          body: emergencyAlert,
-          from: process.env.TWILIO_PHONE_NUMBER as string,
-          to: contact,
-        });
-      } catch (error) {
-        console.error(`Failed to send emergency alert to ${contact}:`, error);
-      }
-    }
-  } catch (error) {
-    console.error("Emergency protocol error:", error);
+    const location =
+      userLocation || "123 Main Street, Downtown Mumbai, Maharashtra";
+
+    const twimlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="alice">Emergency alert activated. Someone at ${location} needs immediate help. This is an automated emergency call from the emergency response system.</Say>
+    <Pause length="2"/>
+    <Say voice="alice">Emergency location is ${location}. Time of alert is ${new Date().toLocaleString()}. Please send assistance immediately.</Say>
+    <Pause length="1"/>
+    <Say voice="alice">This message will repeat. Emergency location is ${location}. Please respond as soon as possible.</Say>
+</Response>`;
+
+    console.log("TwiML being sent:", twimlContent);
+
+    const call = await client.calls.create({
+      twiml: twimlContent,
+      to: emergencyContact || "+917684844015",
+      from: process.env.TWILIO_PHONE_NUMBER!,
+    });
+
+    const smsMessage = `EMERGENCY! Help needed at: Test Location. Time: ${new Date().getHours()}:${String(
+      new Date().getMinutes()
+    ).padStart(2, "0")}. Respond now!`;
+
+    console.log("Sending SMS to:", emergencyContact || "+917684844015");
+    console.log("From number:", process.env.TWILIO_PHONE_NUMBER);
+    console.log("SMS message:", smsMessage);
+
+    const sms = await client.messages.create({
+      body: smsMessage,
+      from: process.env.TWILIO_PHONE_NUMBER!,
+      to: emergencyContact || "+917684844015",
+    });
+
+    console.log("SMS sent successfully:", sms.sid);
+
+    return NextResponse.json({
+      success: true,
+      message: "Emergency alert sent successfully",
+      callSid: call.sid,
+      smsSid: sms.sid,
+    });
+  } catch (error: any) {
+    console.error("Emergency trigger error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to send emergency alert",
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
 }
