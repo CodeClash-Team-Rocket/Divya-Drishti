@@ -27,24 +27,39 @@ export async function POST(
     const body: RequestBody = await req.json();
     const { emergencyContact, userLocation } = body;
 
+    console.log("Emergency trigger request:", body);
+    console.log("Environment check:", {
+      hasSid: !!process.env.TWILIO_ACCOUNT_SID,
+      hasToken: !!process.env.TWILIO_AUTH_TOKEN,
+      hasPhone: !!process.env.TWILIO_PHONE_NUMBER,
+      phoneNumber: process.env.TWILIO_PHONE_NUMBER,
+    });
+
     // Hardcoded location for hackathon demo
     const location =
       userLocation || "123 Main Street, Downtown Mumbai, Maharashtra";
 
-    // Make emergency call
+    // Make emergency call with properly formatted TwiML
+    const twimlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="alice">Emergency alert activated. Someone at ${location} needs immediate help. This is an automated emergency call from the emergency response system.</Say>
+    <Pause length="2"/>
+    <Say voice="alice">Emergency location is ${location}. Time of alert is ${new Date().toLocaleString()}. Please send assistance immediately.</Say>
+    <Pause length="1"/>
+    <Say voice="alice">This message will repeat. Emergency location is ${location}. Please respond as soon as possible.</Say>
+</Response>`;
+
+    console.log("TwiML being sent:", twimlContent);
+
     const call = await client.calls.create({
-      twiml: `<Response>
-        <Say voice="alice">Emergency alert! Someone at ${location} needs immediate help. This is an automated emergency call. Please respond quickly.</Say>
-        <Pause length="2"/>
-        <Say voice="alice">Location: ${location}. Time: ${new Date().toLocaleString()}. Please send assistance.</Say>
-      </Response>`,
+      twiml: twimlContent,
       to: emergencyContact || "+917684844015", // Emergency contact number
       from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
-    // Send emergency SMS
+    // Send emergency SMS with better error handling
     const smsMessage = `🚨 EMERGENCY ALERT 🚨
-    
+
 Someone needs help urgently!
 
 📍 Location: ${location}
@@ -53,11 +68,17 @@ Someone needs help urgently!
 
 Please respond immediately!`;
 
+    console.log("Sending SMS to:", emergencyContact || "+917684844015");
+    console.log("From number:", process.env.TWILIO_PHONE_NUMBER);
+    console.log("SMS message:", smsMessage);
+
     const sms = await client.messages.create({
       body: smsMessage,
       from: process.env.TWILIO_PHONE_NUMBER!,
-      to: emergencyContact || "+919876543210",
+      to: emergencyContact || "+917684844015",
     });
+
+    console.log("SMS sent successfully:", sms.sid);
 
     return NextResponse.json({
       success: true,
