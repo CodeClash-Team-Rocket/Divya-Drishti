@@ -1,330 +1,406 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence, easeInOut } from "framer-motion";
+import {
+  Brain,
+  Eye,
+  Ear,
+  Hand,
+  Heart,
+  Zap,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Github, Play, ArrowRight, Heart, Users, Zap } from "lucide-react";
-import Link from "next/link";
+const AccessibilityHero: React.FC = () => {
+  const [currentFeature, setCurrentFeature] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
-export default function Hero() {
-  const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 },
+  const features = [
+    {
+      icon: Eye,
+      text: "Visual Recognition",
+      description: "AI-powered image and text recognition",
+    },
+    {
+      icon: Ear,
+      text: "Audio Processing",
+      description: "Speech-to-text and audio enhancement",
+    },
+    {
+      icon: Hand,
+      text: "Motor Assistance",
+      description: "Gesture and movement support",
+    },
+    {
+      icon: Brain,
+      text: "Cognitive Aid",
+      description: "Memory and decision-making support",
+    },
+  ];
+
+  // Fixed particle positions to avoid hydration mismatch
+  const particlePositions = [
+    { left: 15, top: 20 },
+    { left: 85, top: 15 },
+    { left: 70, top: 80 },
+    { left: 25, top: 75 },
+    { left: 90, top: 45 },
+    { left: 10, top: 60 },
+    { left: 60, top: 25 },
+    { left: 45, top: 90 },
+    { left: 75, top: 35 },
+    { left: 35, top: 65 },
+    { left: 55, top: 10 },
+    { left: 20, top: 40 },
+    { left: 80, top: 70 },
+    { left: 40, top: 85 },
+    { left: 65, top: 55 },
+  ];
+
+  useEffect(() => {
+    setMounted(true);
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % features.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+        delayChildren: 0.2,
+      },
+    },
   };
 
-  const staggerContainer = {
-    animate: {
+  const itemVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        type: "spring" as const,
+        stiffness: 100,
+        damping: 12,
+      },
+    },
+  };
+
+  const floatingVariants = {
+    initial: { y: 0, rotate: 0 },
+    animate: {
+      y: [-8, 8, -8],
+      rotate: [-1, 1, -1],
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        ease: easeInOut,
+      },
+    },
+  };
+
+  const pulseVariants = {
+    initial: { scale: 1, opacity: 0.8 },
+    animate: {
+      scale: [1, 1.05, 1],
+      opacity: [0.8, 1, 0.8],
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        ease: easeInOut,
       },
     },
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-950/80 backdrop-blur-md border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-xl font-bold"
-          >
-            AI Accessibility
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex gap-6"
-          >
-            <Link
-              href="#models"
-              className="hover:text-blue-400 transition-colors"
-            >
-              Models
-            </Link>
-            <Link
-              href="#impact"
-              className="hover:text-blue-400 transition-colors"
-            >
-              Impact
-            </Link>
-            <Link
-              href="#contact"
-              className="hover:text-blue-400 transition-colors"
-            >
-              Contact
-            </Link>
-          </motion.div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0">
+        {/* Subtle Floating Particles */}
+        {mounted &&
+          particlePositions.map((pos, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gray-500 rounded-full opacity-30"
+              style={{
+                left: `${pos.left}%`,
+                top: `${pos.top}%`,
+              }}
+              animate={{
+                y: [0, -20, 0],
+                opacity: [0.1, 0.3, 0.1],
+                scale: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 4 + i * 0.2,
+                repeat: Infinity,
+                delay: i * 0.3,
+                ease: easeInOut,
+              }}
+            />
+          ))}
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            variants={staggerContainer}
-            initial="initial"
-            animate="animate"
-            className="max-w-4xl mx-auto"
-          >
-            <motion.h1
-              variants={fadeInUp}
-              className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div
+            className="w-full h-full bg-gradient-to-r from-transparent via-gray-400 to-transparent bg-repeat"
+            style={{
+              backgroundImage: `
+                   linear-gradient(90deg, transparent 98%, rgba(156, 163, 175, 0.1) 100%),
+                   linear-gradient(0deg, transparent 98%, rgba(156, 163, 175, 0.1) 100%)
+                 `,
+              backgroundSize: "50px 50px",
+            }}
+          />
+        </div>
+      </div>
+
+      <motion.div
+        className="relative z-10 container mx-auto px-6 py-20"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+          {/* Left Content */}
+          <div className="flex-1 text-center lg:text-left max-w-2xl">
+            <motion.div
+              variants={itemVariants}
+              className="inline-flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-full px-4 py-2 mb-8"
             >
-              AI for Everyone
+              <Sparkles className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-300 text-sm font-medium">
+                Empowering Through AI
+              </span>
+            </motion.div>
+
+            <motion.h1
+              variants={itemVariants}
+              className="text-5xl lg:text-7xl font-bold mb-6 text-white leading-tight"
+            >
+              AI That
+              <br />
+              <span className="relative text-gray-200">
+                Understands
+                <motion.div
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 2, duration: 0.8 }}
+                />
+              </span>
             </motion.h1>
 
             <motion.p
-              variants={fadeInUp}
-              className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed"
+              variants={itemVariants}
+              className="text-xl lg:text-2xl text-gray-400 mb-8 leading-relaxed"
             >
-              Empowering disabled individuals through cutting-edge machine
-              learning models that break barriers and create inclusive digital
-              experiences.
+              Breaking barriers and creating possibilities. Our AI technology
+              adapts to your unique needs, empowering independence and enhancing
+              everyday experiences.
             </motion.p>
 
             <motion.div
-              variants={fadeInUp}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-4 mb-12"
             >
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+              <motion.button
+                className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 border border-gray-600"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
               >
-                Explore Models <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3"
+                Get Started
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+
+              <motion.button
+                className="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-800/50 transition-all duration-300"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
               >
-                View on GitHub <Github className="ml-2 h-4 w-4" />
-              </Button>
+                Learn More
+              </motion.button>
             </motion.div>
 
-            {/* Stats */}
+            {/* Feature Showcase */}
             <motion.div
-              variants={staggerContainer}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto"
+              variants={itemVariants}
+              className="flex flex-wrap gap-3 justify-center lg:justify-start"
             >
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Heart className="h-8 w-8 text-red-500" />
-                </div>
-                <div className="text-3xl font-bold text-blue-400">2</div>
-                <div className="text-gray-400">AI Models</div>
-              </motion.div>
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Users className="h-8 w-8 text-green-500" />
-                </div>
-                <div className="text-3xl font-bold text-blue-400">1000+</div>
-                <div className="text-gray-400">Lives Impacted</div>
-              </motion.div>
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Zap className="h-8 w-8 text-yellow-500" />
-                </div>
-                <div className="text-3xl font-bold text-blue-400">95%</div>
-                <div className="text-gray-400">Accuracy Rate</div>
-              </motion.div>
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-500 ${
+                      currentFeature === index
+                        ? "border-gray-500 bg-gray-700/30 text-white"
+                        : "border-gray-700 bg-gray-800/30 text-gray-400"
+                    }`}
+                    animate={{
+                      scale: currentFeature === index ? 1.02 : 1,
+                    }}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium text-sm">{feature.text}</span>
+                  </motion.div>
+                );
+              })}
             </motion.div>
-          </motion.div>
-        </div>
-      </section>
+          </div>
 
-      {/* Model 1 Section */}
-      <section id="models" className="py-20 px-4 bg-gray-900/50">
-        <div className="container mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid lg:grid-cols-2 gap-12 items-center"
-          >
-            <div>
-              <h2 className="text-4xl font-bold mb-6 text-blue-400">
-                Sign Language Recognition
-              </h2>
-              <p className="text-gray-300 text-lg mb-6 leading-relaxed">
-                Our advanced computer vision model recognizes American Sign
-                Language (ASL) gestures in real-time, enabling seamless
-                communication between deaf and hearing individuals. Built with
-                state-of-the-art deep learning techniques for 99% accuracy.
-              </p>
-              <div className="flex gap-4 mb-8">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Play className="mr-2 h-4 w-4" />
-                  Watch Demo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-gray-600 text-white hover:bg-gray-800"
-                >
-                  <Github className="mr-2 h-4 w-4" />
-                  View Code
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm">
-                  Computer Vision
-                </span>
-                <span className="px-3 py-1 bg-green-600/20 text-green-400 rounded-full text-sm">
-                  Real-time
-                </span>
-                <span className="px-3 py-1 bg-purple-600/20 text-purple-400 rounded-full text-sm">
-                  TensorFlow
-                </span>
-              </div>
-            </div>
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
-                <div className="aspect-video bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-                  <Play className="h-16 w-16 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-white">
-                  ASL Recognition Demo
-                </h3>
-                <p className="text-gray-400">
-                  Real-time sign language detection and translation
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Model 2 Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid lg:grid-cols-2 gap-12 items-center"
-          >
-            <Card className="bg-gray-800 border-gray-700 lg:order-1">
-              <CardContent className="p-6">
-                <div className="aspect-video bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-                  <Play className="h-16 w-16 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-white">
-                  Voice Synthesis Demo
-                </h3>
-                <p className="text-gray-400">
-                  AI-powered speech generation for communication
-                </p>
-              </CardContent>
-            </Card>
-            <div className="lg:order-2">
-              <h2 className="text-4xl font-bold mb-6 text-purple-400">
-                Voice Synthesis for Speech Impaired
-              </h2>
-              <p className="text-gray-300 text-lg mb-6 leading-relaxed">
-                An innovative text-to-speech model that generates
-                natural-sounding voices for individuals with speech impairments.
-                Features personalized voice cloning and emotion-aware synthesis
-                to maintain individual expression and personality.
-              </p>
-              <div className="flex gap-4 mb-8">
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  <Play className="mr-2 h-4 w-4" />
-                  Listen Demo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-gray-600 text-white hover:bg-gray-800"
-                >
-                  <Github className="mr-2 h-4 w-4" />
-                  View Code
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-purple-600/20 text-purple-400 rounded-full text-sm">
-                  NLP
-                </span>
-                <span className="px-3 py-1 bg-pink-600/20 text-pink-400 rounded-full text-sm">
-                  Voice Cloning
-                </span>
-                <span className="px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm">
-                  PyTorch
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Impact Section */}
-      <section id="impact" className="py-20 px-4 bg-gray-900/50">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-4xl font-bold mb-6 text-white">
-              Making a Real Impact
-            </h2>
-            <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-              Our AI models are actively being used by organizations and
-              individuals worldwide, breaking down communication barriers and
-              creating more inclusive environments.
-            </p>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="bg-gray-800 border-gray-700">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-blue-400 mb-2">
-                    50+
-                  </div>
-                  <div className="text-gray-300">Educational Institutions</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gray-800 border-gray-700">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-2">
-                    25+
-                  </div>
-                  <div className="text-gray-300">Healthcare Facilities</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-gray-800 border-gray-700">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-purple-400 mb-2">
-                    100+
-                  </div>
-                  <div className="text-gray-300">Community Centers</div>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-gray-800">
-        <div className="container mx-auto text-center">
-          <div className="text-2xl font-bold mb-4">AI Accessibility</div>
-          <p className="text-gray-400 mb-6">
-            Building a more inclusive future through artificial intelligence
-          </p>
-          <div className="flex justify-center gap-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white"
+          {/* Right Visual */}
+          <div className="flex-1 relative max-w-lg">
+            <motion.div
+              variants={floatingVariants}
+              initial="initial"
+              animate="animate"
+              className="relative"
             >
-              <Github className="h-5 w-5" />
-            </Button>
+              {/* Central AI Brain */}
+              <motion.div
+                className="relative w-80 h-80 mx-auto"
+                variants={pulseVariants}
+                initial="initial"
+                animate="animate"
+              >
+                <div className="absolute inset-0 bg-gray-700/20 rounded-full blur-2xl" />
+                <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-full border border-gray-600/50 flex items-center justify-center shadow-2xl">
+                  <Brain className="w-24 h-24 text-gray-300" />
+                </div>
+              </motion.div>
+
+              {/* Orbiting Icons */}
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                const angle = index * 90 - 90;
+                const radius = 180;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                return (
+                  <motion.div
+                    key={index}
+                    className="absolute w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full border border-gray-600/60 flex items-center justify-center shadow-lg"
+                    style={{
+                      left: "50%",
+                      top: "50%",
+                      marginLeft: x - 32,
+                      marginTop: y - 32,
+                    }}
+                    animate={{
+                      rotate: 360,
+                      scale: currentFeature === index ? 1.1 : 1,
+                    }}
+                    transition={{
+                      rotate: {
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: "linear",
+                      },
+                      scale: {
+                        duration: 0.3,
+                      },
+                    }}
+                  >
+                    <Icon
+                      className={`w-7 h-7 ${
+                        currentFeature === index
+                          ? "text-gray-200"
+                          : "text-gray-400"
+                      }`}
+                    />
+
+                    {/* Subtle Glow */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full"
+                      animate={{
+                        boxShadow:
+                          currentFeature === index
+                            ? "0 0 20px rgba(156, 163, 175, 0.3)"
+                            : "0 0 0px rgba(156, 163, 175, 0)",
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
+                );
+              })}
+
+              {/* Connecting Lines to Center */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
+                {features.map((_, index) => {
+                  const angle = index * 90 - 90;
+                  const radius = 180;
+                  const x1 =
+                    50 +
+                    (Math.cos((angle * Math.PI) / 180) * radius * 0.3) / 3.2;
+                  const y1 =
+                    50 +
+                    (Math.sin((angle * Math.PI) / 180) * radius * 0.3) / 3.2;
+                  const x2 =
+                    50 +
+                    (Math.cos((angle * Math.PI) / 180) * radius * 0.7) / 3.2;
+                  const y2 =
+                    50 +
+                    (Math.sin((angle * Math.PI) / 180) * radius * 0.7) / 3.2;
+
+                  return (
+                    <motion.line
+                      key={index}
+                      x1={`${x1}%`}
+                      y1={`${y1}%`}
+                      x2={`${x2}%`}
+                      y2={`${y2}%`}
+                      stroke={currentFeature === index ? "#9ca3af" : "#6b7280"}
+                      strokeWidth="1"
+                      strokeDasharray="3,3"
+                      animate={{
+                        strokeOpacity: currentFeature === index ? 0.6 : 0.2,
+                        strokeDashoffset: [0, -6],
+                      }}
+                      transition={{
+                        strokeDashoffset: {
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear",
+                        },
+                        strokeOpacity: {
+                          duration: 0.3,
+                        },
+                      }}
+                    />
+                  );
+                })}
+              </svg>
+            </motion.div>
+
+            {/* Feature Description */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentFeature}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="mt-8 text-center"
+              >
+                <h3 className="text-xl font-semibold text-gray-200 mb-2">
+                  {features[currentFeature].text}
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  {features[currentFeature].description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-      </footer>
+      </motion.div>
     </div>
   );
-}
+};
+
+export default AccessibilityHero;
