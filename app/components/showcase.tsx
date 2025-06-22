@@ -27,7 +27,7 @@ interface ModelInfo {
   description: string;
   features: string[];
   accuracy: string;
-  videoPlaceholder: string;
+  videoUrl: string;
 }
 
 const MLModelsShowcase: React.FC = () => {
@@ -78,7 +78,7 @@ const MLModelsShowcase: React.FC = () => {
         "Navigation assistance with obstacle detection",
       ],
       accuracy: "97.2%",
-      videoPlaceholder: "Visual Recognition Demo",
+      videoUrl: "https://www.youtube.com/embed/phupkcV_204?si=rPEeysW8nmH_QROA",
     },
     {
       id: "2",
@@ -92,7 +92,7 @@ const MLModelsShowcase: React.FC = () => {
         "Emergency detection and response system",
       ],
       accuracy: "94.8%",
-      videoPlaceholder: "Cognitive Aid Demo",
+      videoUrl: "https://www.youtube.com/embed/NAT0WzSdmXQ?si=QjZkYQXv6D9EL5Fh",
     },
   ];
 
@@ -259,35 +259,24 @@ const MLModelsShowcase: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 border border-gray-700/50 shadow-2xl"
                   >
-                    <div className="aspect-video bg-gray-700/50 rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
+                    <div className="aspect-video bg-gray-700/50 rounded-2xl overflow-hidden mb-6">
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
-                        className="text-center"
+                        className="w-full h-full"
                       >
-                        <div className="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                          >
-                            {index === 0 ? (
-                              <Eye className="w-8 h-8 text-gray-400" />
-                            ) : (
-                              <Brain className="w-8 h-8 text-gray-400" />
-                            )}
-                          </motion.div>
-                        </div>
-                        <p className="text-gray-300 font-medium">
-                          {model.videoPlaceholder}
-                        </p>
-                        <p className="text-sm text-gray-400 mt-2">
-                          Interactive Demo Coming Soon
-                        </p>
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={model.videoUrl}
+                          title="AI Model Demo"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                          className="rounded-2xl"
+                        ></iframe>
                       </motion.div>
                     </div>
 
