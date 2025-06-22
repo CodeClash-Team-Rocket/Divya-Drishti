@@ -57,20 +57,18 @@ export async function POST(
       from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
-    // Send emergency SMS with better error handling
-    const smsMessage = `🚨 EMERGENCY ALERT 🚨
-
-Someone needs help urgently!
-
-📍 Location: ${location}
-⏰ Time: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-📱 System: Automated Emergency Alert
-
-Please respond immediately!`;
+    // Send emergency SMS - SHORT VERSION for trial account
+    const smsMessage = `EMERGENCY! Help at: ${location.substring(
+      0,
+      30
+    )}... Time: ${new Date().getHours()}:${String(
+      new Date().getMinutes()
+    ).padStart(2, "0")} RESPOND NOW!`;
 
     console.log("Sending SMS to:", emergencyContact || "+917684844015");
     console.log("From number:", process.env.TWILIO_PHONE_NUMBER);
     console.log("SMS message:", smsMessage);
+    console.log("SMS message length:", smsMessage.length);
 
     const sms = await client.messages.create({
       body: smsMessage,
