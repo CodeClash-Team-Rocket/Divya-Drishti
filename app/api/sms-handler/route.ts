@@ -34,8 +34,7 @@ export async function POST(
       phoneNumber: process.env.TWILIO_PHONE_NUMBER,
     });
 
-    const location =
-      userLocation || "123 Main Street, Downtown Mumbai, Maharashtra";
+    const location = userLocation || "Bhopal Indore Highway , Madhya Pradesh";
 
     const twimlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>

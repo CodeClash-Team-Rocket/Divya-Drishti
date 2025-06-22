@@ -40,10 +40,10 @@ const EmergencyButton: React.FC = () => {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          mode: "cors", // Explicitly set CORS mode
+          mode: "cors",
           body: JSON.stringify({
             emergencyContact: "+917684844015",
-            userLocation: "Mumbai Maharashtra",
+            userLocation: "Bhopal Madhya Pradesh",
           }),
         }
       );
