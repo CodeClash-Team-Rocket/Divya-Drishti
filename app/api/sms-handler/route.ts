@@ -1,4 +1,3 @@
-// app/api/sms-handler/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 
@@ -16,7 +15,6 @@ export async function POST(request: NextRequest) {
 
     console.log(`Received SMS from ${fromNumber}: ${incomingMessage}`);
 
-    // Check if the incoming message is an emergency keyword
     const emergencyKeywords = ["emergency", "help", "sos", "urgent", "panic"];
     const isEmergency = emergencyKeywords.some((keyword) =>
       incomingMessage.toLowerCase().includes(keyword)
@@ -25,35 +23,19 @@ export async function POST(request: NextRequest) {
     let responseMessage: string;
 
     if (isEmergency) {
-      // Handle emergency SMS
       responseMessage = `🚨 EMERGENCY RECEIVED 🚨
+Alert activated!
+Time: ${new Date().toLocaleTimeString("en-IN")}
+Help is coming. Stay calm.
+Reply CANCEL to stop.`;
 
-Your emergency alert has been activated!
-
-📍 Emergency services have been notified
-⏰ Time: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-📱 Your location is being tracked
-
-Stay calm. Help is on the way!
-
-Reply CANCEL to stop alerts.`;
-
-      // Trigger emergency protocol
       await triggerEmergencyProtocol(fromNumber, incomingMessage);
     } else {
-      // Regular auto-response
-      responseMessage = `Hello! Thanks for your message: "${incomingMessage}"
-
-This is an automated response. For emergencies, text keywords like:
-• EMERGENCY
-• HELP  
-• SOS
-• URGENT
-
-Our system is active 24/7 for emergency alerts.`;
+      responseMessage = `Thanks for your message: "${incomingMessage}"
+For emergencies, text: EMERGENCY, HELP, SOS, URGENT
+System active 24/7.`;
     }
 
-    // Create TwiML response for SMS
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Message>${responseMessage}</Message>
@@ -87,20 +69,13 @@ async function triggerEmergencyProtocol(
   message: string
 ): Promise<void> {
   try {
-    const emergencyContacts = [
-      "+917684844015", // Replace with actual emergency contacts
-    ];
+    const emergencyContacts = ["+917684844015"];
 
-    const emergencyAlert = `🚨 EMERGENCY ALERT 🚨
-
-Someone sent an emergency SMS!
-
-📱 From: ${fromNumber}
-📝 Message: "${message}"
-📍 Location: [Location tracking initiated]
-⏰ Time: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-
-Please respond immediately!`;
+    const emergencyAlert = `🚨 EMERGENCY SMS 🚨
+From: ${fromNumber}
+Msg: "${message}"
+Time: ${new Date().toLocaleTimeString("en-IN")}
+Respond now!`;
 
     for (const contact of emergencyContacts) {
       try {
