@@ -1,7 +1,5 @@
-// pages/api/trigger-emergency.ts (Optional - for triggering from frontend)
-// OR app/api/trigger-emergency/route.ts for App Router
-
-import { NextApiRequest, NextApiResponse } from "next";
+// app/api/trigger-emergency/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 
 const client = twilio(
@@ -22,19 +20,12 @@ interface ApiResponse {
   error?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse>
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      message: "Method not allowed",
-    });
-  }
-
+export async function POST(
+  req: NextRequest
+): Promise<NextResponse<ApiResponse>> {
   try {
-    const { emergencyContact, userLocation }: RequestBody = req.body;
+    const body: RequestBody = await req.json();
+    const { emergencyContact, userLocation } = body;
 
     // Hardcoded location for hackathon demo
     const location =
@@ -64,11 +55,11 @@ Please respond immediately!`;
 
     const sms = await client.messages.create({
       body: smsMessage,
-      from: process.env.TWILIO_PHONE_NUMBER,
+      from: process.env.TWILIO_PHONE_NUMBER!,
       to: emergencyContact || "+919876543210",
     });
 
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       message: "Emergency alert sent successfully",
       callSid: call.sid,
@@ -76,10 +67,13 @@ Please respond immediately!`;
     });
   } catch (error: any) {
     console.error("Emergency trigger error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to send emergency alert",
-      error: error.message,
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to send emergency alert",
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

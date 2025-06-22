@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import twilio, { Twilio } from "twilio";
 
 const client: Twilio = twilio(
@@ -6,18 +6,17 @@ const client: Twilio = twilio(
   process.env.TWILIO_AUTH_TOKEN!
 );
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const callerNumber: string | undefined = req.body.From;
+    // Parse form data from Twilio webhook
+    const formData = await req.formData();
+    const callerNumber: string | null = formData.get("From") as string;
+
     if (!callerNumber) {
-      return res.status(400).json({ message: "Missing caller number" });
+      return NextResponse.json(
+        { message: "Missing caller number" },
+        { status: 400 }
+      );
     }
 
     const emergencyLocation = "123 Main Street, Downtown Mumbai, Maharashtra";
@@ -64,8 +63,12 @@ Please send help immediately!`;
     }
 
     // Return TwiML response
-    res.setHeader("Content-Type", "text/xml");
-    res.status(200).send(twiml);
+    return new NextResponse(twiml, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/xml",
+      },
+    });
   } catch (error: unknown) {
     console.error("Emergency call handler error:", error);
 
@@ -75,7 +78,11 @@ Please send help immediately!`;
     <Say voice="alice">Emergency system activated. Help is on the way.</Say>
 </Response>`;
 
-    res.setHeader("Content-Type", "text/xml");
-    res.status(200).send(errorTwiml);
+    return new NextResponse(errorTwiml, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/xml",
+      },
+    });
   }
 }

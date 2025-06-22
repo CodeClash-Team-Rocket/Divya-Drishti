@@ -1,5 +1,4 @@
-// app/api/sms-handler/route.ts (App Router version)
-
+// app/api/sms-handler/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 
