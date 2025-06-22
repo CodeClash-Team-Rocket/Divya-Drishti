@@ -1,4 +1,3 @@
-// app/api/trigger-emergency/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 

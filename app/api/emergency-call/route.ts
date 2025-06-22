@@ -8,7 +8,6 @@ const client: Twilio = twilio(
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse form data from Twilio webhook
     const formData = await req.formData();
     const callerNumber: string | null = formData.get("From") as string;
 
@@ -38,18 +37,14 @@ Phone: ${callerNumber}
 
 Please send help immediately!`;
 
-    // Send SMS to the same number that called (for demo purposes)
-    // In real scenario, you'd send to emergency contacts
     await client.messages.create({
       body: smsMessage,
       from: process.env.TWILIO_PHONE_NUMBER!,
-      to: callerNumber, // Sending back to caller for demo
+      to: callerNumber,
     });
 
-    // You can also send to predefined emergency contacts
     const emergencyContacts: string[] = ["+917684844015"];
 
-    // Send SMS to emergency contacts
     for (const contact of emergencyContacts) {
       try {
         await client.messages.create({
@@ -62,7 +57,6 @@ Please send help immediately!`;
       }
     }
 
-    // Return TwiML response
     return new NextResponse(twiml, {
       status: 200,
       headers: {
@@ -72,7 +66,6 @@ Please send help immediately!`;
   } catch (error: unknown) {
     console.error("Emergency call handler error:", error);
 
-    // Fallback TwiML response
     const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Say voice="alice">Emergency system activated. Help is on the way.</Say>

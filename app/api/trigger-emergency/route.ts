@@ -1,4 +1,3 @@
-// app/api/trigger-emergency/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 
@@ -20,7 +19,6 @@ interface ApiResponse {
   error?: string;
 }
 
-// CORS headers function
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "https://code-clash-bay.vercel.app/",
@@ -29,7 +27,6 @@ function corsHeaders() {
   };
 }
 
-// Handle preflight OPTIONS request
 export async function OPTIONS(req: NextRequest) {
   return new NextResponse(null, {
     status: 200,
@@ -52,7 +49,6 @@ export async function POST(
       phoneNumber: process.env.TWILIO_PHONE_NUMBER,
     });
 
-    // Hardcoded location for hackathon demo
     const location =
       userLocation || "123 Main Street, Downtown Mumbai, Maharashtra";
 
@@ -70,11 +66,10 @@ export async function POST(
 
     const call = await client.calls.create({
       twiml: twimlContent,
-      to: emergencyContact || "+917684844015", // Emergency contact number
+      to: emergencyContact || "+917684844015",
       from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
-    // Send emergency SMS - SHORT VERSION for trial account
     const smsMessage = `EMERGENCY! Help at: ${location.substring(
       0,
       30
