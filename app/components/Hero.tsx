@@ -58,7 +58,7 @@ const EmergencyButton: React.FC = () => {
         }, 5000);
       } else {
         console.error("Emergency call failed with status:", response.status);
-        // Fallback success for demo purposes
+
         setEmergencyTriggered(true);
         setTimeout(() => {
           setIsPressed(false);
@@ -68,8 +68,6 @@ const EmergencyButton: React.FC = () => {
     } catch (error) {
       console.error("Emergency call failed:", error);
 
-      // Fallback: Show success state even if API fails (for demo purposes)
-      // In production, you might want to show an error state instead
       setEmergencyTriggered(true);
       setTimeout(() => {
         setIsPressed(false);
@@ -85,7 +83,6 @@ const EmergencyButton: React.FC = () => {
 
   return (
     <>
-      {/* Emergency Button */}
       <motion.div
         className="fixed top-6 right-6 z-50"
         initial={{ scale: 0, opacity: 0 }}
@@ -109,7 +106,6 @@ const EmergencyButton: React.FC = () => {
               : "0 0 15px rgba(239, 68, 68, 0.4)",
           }}
         >
-          {/* Pulsing Ring */}
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-red-400"
             animate={{
@@ -123,7 +119,6 @@ const EmergencyButton: React.FC = () => {
             }}
           />
 
-          {/* Icon */}
           <div className="relative flex items-center justify-center w-full h-full">
             {isLoading ? (
               <motion.div
@@ -138,7 +133,6 @@ const EmergencyButton: React.FC = () => {
             )}
           </div>
 
-          {/* Status Indicators */}
           {(isPressed || emergencyTriggered) && (
             <motion.div
               className="absolute -top-1 -right-1 flex gap-1"
@@ -164,7 +158,6 @@ const EmergencyButton: React.FC = () => {
           )}
         </motion.button>
 
-        {/* Emergency Label */}
         <motion.div
           className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black/60 px-2 py-1 rounded backdrop-blur-sm"
           initial={{ opacity: 0, y: -10 }}
@@ -175,7 +168,6 @@ const EmergencyButton: React.FC = () => {
         </motion.div>
       </motion.div>
 
-      {/* Confirmation Modal */}
       <AnimatePresence>
         {showConfirmation && (
           <motion.div
@@ -268,7 +260,6 @@ const AccessibilityHero: React.FC = () => {
     },
   ];
 
-  // Fixed particle positions to avoid hydration mismatch
   const particlePositions = [
     { left: 15, top: 20 },
     { left: 85, top: 15 },
@@ -347,12 +338,9 @@ const AccessibilityHero: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-      {/* Emergency Button */}
       <EmergencyButton />
 
-      {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        {/* Subtle Floating Particles */}
         {mounted &&
           particlePositions.map((pos, i) => (
             <motion.div
@@ -376,7 +364,6 @@ const AccessibilityHero: React.FC = () => {
             />
           ))}
 
-        {/* Subtle Grid Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div
             className="w-full h-full bg-gradient-to-r from-transparent via-gray-400 to-transparent bg-repeat"
@@ -398,7 +385,6 @@ const AccessibilityHero: React.FC = () => {
         animate="visible"
       >
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-          {/* Left Content */}
           <div className="flex-1 text-center lg:text-left max-w-2xl">
             <motion.div
               variants={itemVariants}
@@ -458,7 +444,6 @@ const AccessibilityHero: React.FC = () => {
               </motion.button>
             </motion.div>
 
-            {/* Feature Showcase */}
             <motion.div
               variants={itemVariants}
               className="flex flex-wrap gap-3 justify-center lg:justify-start"
@@ -468,7 +453,7 @@ const AccessibilityHero: React.FC = () => {
                 return (
                   <motion.div
                     key={index}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-500 ${
+                    className={`flex items-center gap-3 px-4 py-3 mt-10 rounded-lg border transition-all duration-500 ${
                       currentFeature === index
                         ? "border-gray-500 bg-gray-700/30 text-white"
                         : "border-gray-700 bg-gray-800/30 text-gray-400"
@@ -485,7 +470,6 @@ const AccessibilityHero: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Right Visual */}
           <div className="flex-1 relative max-w-lg">
             <motion.div
               variants={floatingVariants}
@@ -493,7 +477,6 @@ const AccessibilityHero: React.FC = () => {
               animate="animate"
               className="relative"
             >
-              {/* Central AI Brain */}
               <motion.div
                 className="relative w-80 h-80 mx-auto"
                 variants={pulseVariants}
@@ -506,7 +489,6 @@ const AccessibilityHero: React.FC = () => {
                 </div>
               </motion.div>
 
-              {/* Orbiting Icons */}
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 const angle = index * 90 - 90;
@@ -547,7 +529,6 @@ const AccessibilityHero: React.FC = () => {
                       }`}
                     />
 
-                    {/* Subtle Glow */}
                     <motion.div
                       className="absolute inset-0 rounded-full"
                       animate={{
@@ -562,7 +543,6 @@ const AccessibilityHero: React.FC = () => {
                 );
               })}
 
-              {/* Connecting Lines to Center */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
                 {features.map((_, index) => {
                   const angle = index * 90 - 90;
@@ -610,7 +590,6 @@ const AccessibilityHero: React.FC = () => {
               </svg>
             </motion.div>
 
-            {/* Feature Description */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentFeature}
@@ -618,7 +597,7 @@ const AccessibilityHero: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.3 }}
-                className="mt-8 text-center"
+                className="mt-10 p-5 text-center"
               >
                 <h3 className="text-xl font-semibold text-gray-200 mb-2">
                   {features[currentFeature].text}
