@@ -14,6 +14,8 @@ import {
   MessageCircle,
   Shield,
   AlertTriangle,
+  MapPin,
+  Loader,
 } from "lucide-react";
 
 const EmergencyButton: React.FC = () => {
@@ -21,9 +23,96 @@ const EmergencyButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [emergencyTriggered, setEmergencyTriggered] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<string>("");
+
+  // Function to get user's current location
+  const getCurrentLocation = (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported by this browser"));
+        return;
+      }
+
+      setLocationLoading(true);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            
+            // Convert coordinates to address using OpenCage API
+            // Replace 'YOUR_OPENCAGE_API_KEY' with your actual API key
+            const response = await fetch(
+              `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY ||'f5983f46a33140949d18bf74a5af521b'}`
+            );
+            
+            if (!response.ok) {
+              throw new Error("Failed to fetch location data");
+            }
+            
+            const data = await response.json();
+            
+            if (data.results && data.results.length > 0) {
+              const result = data.results[0];
+              const formattedAddress = result.formatted || 
+                `Coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+              
+              setLocationLoading(false);
+              setCurrentLocation(formattedAddress);
+              resolve(formattedAddress);
+            } else {
+              const fallbackLocation = `Coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+              setLocationLoading(false);
+              setCurrentLocation(fallbackLocation);
+              resolve(fallbackLocation);
+            }
+          } catch (error) {
+            console.error("Error converting coordinates to address:", error);
+            const fallbackLocation = `Coordinates: ${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+            setLocationLoading(false);
+            setCurrentLocation(fallbackLocation);
+            resolve(fallbackLocation);
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setLocationLoading(false);
+          let fallbackLocation = "Indore, Madhya Pradesh, India"; // Using your location as fallback
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              fallbackLocation = "Location access denied - Indore, Madhya Pradesh, India";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              fallbackLocation = "Location unavailable - Indore, Madhya Pradesh, India";
+              break;
+            case error.TIMEOUT:
+              fallbackLocation = "Location timeout - Indore, Madhya Pradesh, India";
+              break;
+          }
+          
+          setCurrentLocation(fallbackLocation);
+          resolve(fallbackLocation);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000, // Increased timeout
+          maximumAge: 300000 // 5 minutes
+        }
+      );
+    });
+  };
 
   const handleEmergencyClick = async () => {
     setShowConfirmation(true);
+    // Pre-fetch location when confirmation dialog opens
+    try {
+      await getCurrentLocation();
+    } catch (error) {
+      console.error("Failed to get location:", error);
+      setCurrentLocation("Indore, Madhya Pradesh, India"); // Fallback to your location
+    }
   };
 
   const confirmEmergency = async () => {
@@ -32,6 +121,19 @@ const EmergencyButton: React.FC = () => {
     setShowConfirmation(false);
 
     try {
+      // Ensure we have a location to send
+      let locationToSend = currentLocation;
+      if (!locationToSend) {
+        try {
+          locationToSend = await getCurrentLocation();
+        } catch (error) {
+          console.error("Failed to get location:", error);
+          locationToSend = "Indore, Madhya Pradesh, India"; // Fallback to your location
+        }
+      }
+
+      console.log("Sending emergency request with location:", locationToSend);
+
       const response = await fetch(
         "https://code-clash-bay.vercel.app/api/trigger-emergency",
         {
@@ -40,10 +142,10 @@ const EmergencyButton: React.FC = () => {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          mode: "cors", // Explicitly set CORS mode
+          mode: "cors",
           body: JSON.stringify({
             emergencyContact: "+917684844015",
-            userLocation: "Mumbai Maharashtra",
+            userLocation: locationToSend, // Send the actual user location
           }),
         }
       );
@@ -58,7 +160,8 @@ const EmergencyButton: React.FC = () => {
         }, 5000);
       } else {
         console.error("Emergency call failed with status:", response.status);
-
+        const errorData = await response.text();
+        console.error("Error details:", errorData);
         setEmergencyTriggered(true);
         setTimeout(() => {
           setIsPressed(false);
@@ -67,7 +170,6 @@ const EmergencyButton: React.FC = () => {
       }
     } catch (error) {
       console.error("Emergency call failed:", error);
-
       setEmergencyTriggered(true);
       setTimeout(() => {
         setIsPressed(false);
@@ -77,8 +179,10 @@ const EmergencyButton: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   const cancelEmergency = () => {
     setShowConfirmation(false);
+    setCurrentLocation("");
   };
 
   return (
@@ -200,10 +304,31 @@ const EmergencyButton: React.FC = () => {
                 <h3 className="text-xl font-bold text-white mb-2">
                   Emergency Alert
                 </h3>
-                <p className="text-gray-400 mb-6">
+                <p className="text-gray-400 mb-4">
                   This will immediately call emergency contacts and send SMS
-                  alerts. Are you sure?
+                  alerts with your current location. Are you sure?
                 </p>
+
+                {/* Location Display */}
+                <div className="bg-gray-800 rounded-lg p-3 mb-6 border border-gray-700">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-300">
+                      Emergency Location
+                    </span>
+                  </div>
+                  
+                  {locationLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader className="w-4 h-4 text-gray-400 animate-spin" />
+                      <span className="text-sm text-gray-400">Getting location...</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-200 break-words">
+                      {currentLocation || "Getting location..."}
+                    </p>
+                  )}
+                </div>
 
                 <div className="flex gap-3">
                   <motion.button
@@ -216,12 +341,13 @@ const EmergencyButton: React.FC = () => {
                   </motion.button>
                   <motion.button
                     onClick={confirmEmergency}
-                    className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all duration-200 flex items-center justify-center gap-2"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    disabled={locationLoading}
+                    className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    whileHover={{ scale: locationLoading ? 1 : 1.02 }}
+                    whileTap={{ scale: locationLoading ? 1 : 0.98 }}
                   >
                     <Phone className="w-4 h-4" />
-                    Confirm
+                    {locationLoading ? "Getting Location..." : "Send Alert"}
                   </motion.button>
                 </div>
               </div>

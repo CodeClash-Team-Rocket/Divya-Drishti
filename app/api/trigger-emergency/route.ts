@@ -19,11 +19,13 @@ interface ApiResponse {
   error?: string;
 }
 
+// CORS headers - allow all origins (including localhost:3000)
 function corsHeaders() {
   return {
-    "Access-Control-Allow-Origin": "https://code-clash-bay.vercel.app/",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Accept",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS, GET, PUT, DELETE",
+    "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, X-Requested-With",
+    "Access-Control-Max-Age": "86400",
   };
 }
 
@@ -37,6 +39,7 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse>> {
+  
   try {
     const body: RequestBody = await req.json();
     const { emergencyContact, userLocation } = body;
@@ -49,46 +52,61 @@ export async function POST(
       phoneNumber: process.env.TWILIO_PHONE_NUMBER,
     });
 
-    const location =
-      userLocation || "123 Main Street, Downtown Mumbai, Maharashtra";
+    // Use the actual user location passed from frontend
+    const location = userLocation || "Location not available - emergency contact needed";
+    const contactNumber = emergencyContact || "+917684844015";
 
-    // Make emergency call with properly formatted TwiML
+    // Format current time in IST
+    const currentTime = new Date().toLocaleString("en-IN", { 
+      timeZone: "Asia/Kolkata",
+      hour12: true,
+      dateStyle: 'short',
+      timeStyle: 'short'
+    });
+
     const twimlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say voice="alice">Emergency alert activated. Someone at ${location} needs immediate help. This is an automated emergency call from the emergency response system.</Say>
+    <Say voice="alice">Emergency alert activated. Someone at the following location needs immediate help: ${location}. This is an automated emergency call from the emergency response system.</Say>
     <Pause length="2"/>
-    <Say voice="alice">Emergency location is ${location}. Time of alert is ${new Date().toLocaleString()}. Please send assistance immediately.</Say>
+    <Say voice="alice">Emergency location is: ${location}. Time of alert is ${currentTime}. Please send assistance immediately.</Say>
     <Pause length="1"/>
-    <Say voice="alice">This message will repeat. Emergency location is ${location}. Please respond as soon as possible.</Say>
+    <Say voice="alice">This message will repeat. Emergency location is: ${location}. Please respond as soon as possible.</Say>
 </Response>`;
 
     console.log("TwiML being sent:", twimlContent);
 
+    // Make the emergency call
     const call = await client.calls.create({
       twiml: twimlContent,
-      to: emergencyContact || "+917684844015",
+      to: contactNumber,
       from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
-    const smsMessage = `EMERGENCY! Help at: ${location.substring(
-      0,
-      30
-    )}... Time: ${new Date().getHours()}:${String(
-      new Date().getMinutes()
-    ).padStart(2, "0")} RESPOND NOW!`;
+    // Create emergency SMS with actual location
+    const smsMessage = `🚨 EMERGENCY ALERT 🚨
 
-    console.log("Sending SMS to:", emergencyContact || "+917684844015");
+Someone needs immediate help!
+
+📍 Location: ${location}
+⏰ Time: ${currentTime}
+🆘 Please respond immediately!
+
+This is an automated emergency alert.`;
+
+    console.log("Sending SMS to:", contactNumber);
     console.log("From number:", process.env.TWILIO_PHONE_NUMBER);
     console.log("SMS message:", smsMessage);
     console.log("SMS message length:", smsMessage.length);
 
+    // Send emergency SMS
     const sms = await client.messages.create({
       body: smsMessage,
       from: process.env.TWILIO_PHONE_NUMBER!,
-      to: emergencyContact || "+917684844015",
+      to: contactNumber,
     });
 
     console.log("SMS sent successfully:", sms.sid);
+    console.log("Call initiated successfully:", call.sid);
 
     return NextResponse.json(
       {
