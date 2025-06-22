@@ -10,7 +10,7 @@ export default function page() {
     <div>
       <Hero />
       <Showcase />
-      <EmergencyButton />
+      {/* <EmergencyButton /> */}
     </div>
   );
 }

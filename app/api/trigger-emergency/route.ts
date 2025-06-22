@@ -20,6 +20,23 @@ interface ApiResponse {
   error?: string;
 }
 
+// CORS headers function
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "https://code-clash-bay.vercel.app/",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Accept",
+  };
+}
+
+// Handle preflight OPTIONS request
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders(),
+  });
+}
+
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse>> {
@@ -78,12 +95,18 @@ export async function POST(
 
     console.log("SMS sent successfully:", sms.sid);
 
-    return NextResponse.json({
-      success: true,
-      message: "Emergency alert sent successfully",
-      callSid: call.sid,
-      smsSid: sms.sid,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Emergency alert sent successfully",
+        callSid: call.sid,
+        smsSid: sms.sid,
+      },
+      {
+        status: 200,
+        headers: corsHeaders(),
+      }
+    );
   } catch (error: any) {
     console.error("Emergency trigger error:", error);
     return NextResponse.json(
@@ -92,7 +115,10 @@ export async function POST(
         message: "Failed to send emergency alert",
         error: error.message,
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders(),
+      }
     );
   }
 }
