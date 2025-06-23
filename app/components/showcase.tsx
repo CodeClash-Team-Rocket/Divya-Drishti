@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import {
@@ -68,7 +69,7 @@ const MLModelsShowcase: React.FC = () => {
   const models: ModelInfo[] = [
     {
       id: "1",
-      title: "Visual Recognition AI",
+      title: "Obstacle Detection and Navigation",
       description:
         "Advanced computer vision model that helps visually impaired individuals navigate their environment by identifying objects, reading text, and describing scenes in real-time.",
       features: [
@@ -82,14 +83,14 @@ const MLModelsShowcase: React.FC = () => {
     },
     {
       id: "2",
-      title: "Cognitive Support System",
+      title: "Sign Language Recognition",
       description:
-        "AI-powered cognitive aid that assists individuals with memory and decision-making challenges through personalized reminders, task guidance, and adaptive learning.",
+        "AI model that translates sign language into text and speech.This model supports multiple sign languages and provides real-time translation for effective communication.",
       features: [
-        "Personalized memory assistance and reminders",
-        "Step-by-step task guidance and breakdown",
-        "Adaptive learning based on user patterns",
-        "Emergency detection and response system",
+        "Real-time sign language translation",
+        "Support for multiple sign languages",
+        "User-friendly interface for easy communication",
+        "Integration with video calling platforms",
       ],
       accuracy: "94.8%",
       videoUrl: "https://www.youtube.com/embed/NAT0WzSdmXQ?si=QjZkYQXv6D9EL5Fh",
@@ -365,16 +366,21 @@ const MLModelsShowcase: React.FC = () => {
                       transition={{ delay: 1, duration: 0.6 }}
                       className="mt-8"
                     >
-                      <motion.button
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0 20px 40px rgba(156, 163, 175, 0.3)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300"
+                      <Link
+                        href="https://github.com/CodeClash-Team-Rocket/Divya-Drishti-Models"
+                        target="_blank"
                       >
-                        Learn More
-                      </motion.button>
+                        <motion.button
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0 20px 40px rgba(156, 163, 175, 0.3)",
+                          }}
+                          whileTap={{ scale: 0.95 }}
+                          className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300"
+                        >
+                          Learn More
+                        </motion.button>
+                      </Link>
                     </motion.div>
                   </motion.div>
                 </motion.div>

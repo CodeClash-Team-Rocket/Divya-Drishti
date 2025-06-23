@@ -15,6 +15,7 @@ import {
   Shield,
   AlertTriangle,
 } from "lucide-react";
+import Link from "next/link";
 
 const EmergencyButton: React.FC = () => {
   const [isPressed, setIsPressed] = useState(false);
@@ -400,10 +401,10 @@ const AccessibilityHero: React.FC = () => {
               variants={itemVariants}
               className="text-5xl lg:text-7xl font-bold mb-6 text-white leading-tight"
             >
-              AI That
+              Divya
               <br />
               <span className="relative text-gray-200">
-                Understands
+                Dhrishti
                 <motion.div
                   className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full"
                   initial={{ scaleX: 0 }}
@@ -426,14 +427,19 @@ const AccessibilityHero: React.FC = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 mb-12"
             >
-              <motion.button
-                className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 border border-gray-600"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
+              <Link
+                href="https://github.com/CodeClash-Team-Rocket"
+                target="_blank"
               >
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
+                <motion.button
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300 border border-gray-600"
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Get Started
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </Link>
 
               <motion.button
                 className="border-2 border-gray-600 text-gray-300 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-800/50 transition-all duration-300"
