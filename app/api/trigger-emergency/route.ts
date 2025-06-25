@@ -65,7 +65,7 @@ export async function POST(
 
     const call = await client.calls.create({
       twiml: twimlContent,
-      to: emergencyContact || "+917684844015",
+      to: emergencyContact || "+918789425130",
       from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
@@ -76,7 +76,7 @@ export async function POST(
       new Date().getMinutes()
     ).padStart(2, "0")} RESPOND NOW!`;
 
-    console.log("Sending SMS to:", emergencyContact || "+917684844015");
+    console.log("Sending SMS to:", emergencyContact || "+918789425130");
     console.log("From number:", process.env.TWILIO_PHONE_NUMBER);
     console.log("SMS message:", smsMessage);
     console.log("SMS message length:", smsMessage.length);
@@ -84,7 +84,7 @@ export async function POST(
     const sms = await client.messages.create({
       body: smsMessage,
       from: process.env.TWILIO_PHONE_NUMBER!,
-      to: emergencyContact || "+917684844015",
+      to: emergencyContact || "+918789425130",
     });
 
     console.log("SMS sent successfully:", sms.sid);
