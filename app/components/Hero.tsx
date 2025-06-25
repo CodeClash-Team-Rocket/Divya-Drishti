@@ -43,7 +43,7 @@ const EmergencyButton: React.FC = () => {
           },
           mode: "cors",
           body: JSON.stringify({
-            emergencyContact: "+918789425130",
+            emergencyContact: "+918530480982",
             userLocation: "Bhopal Madhya Pradesh",
           }),
         }

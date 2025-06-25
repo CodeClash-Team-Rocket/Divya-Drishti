@@ -43,7 +43,7 @@ Please send help immediately!`;
       to: callerNumber,
     });
 
-    const emergencyContacts: string[] = ["+918789425130"];
+    const emergencyContacts: string[] = ["+918530480982"];
 
     for (const contact of emergencyContacts) {
       try {

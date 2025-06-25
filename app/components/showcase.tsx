@@ -59,9 +59,9 @@ const MLModelsShowcase: React.FC = () => {
     },
     {
       id: "4",
-      label: "Awards Won",
-      value: 8,
-      suffix: "+",
+      label: "Fast Detection",
+      value: 0.3,
+      suffix: "s",
       icon: <Award className="w-6 h-6" />,
     },
   ];
@@ -165,7 +165,7 @@ const MLModelsShowcase: React.FC = () => {
           >
             <motion.h2
               variants={itemVariants}
-              className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-400 to-gray-200 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold mb-8 bg-gradient-to-r from-gray-400 to-gray-200 bg-clip-text text-transparent p-4"
             >
               Empowering Lives Through AI
             </motion.h2>
